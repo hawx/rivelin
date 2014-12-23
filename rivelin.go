@@ -6,17 +6,19 @@ import (
 
 	"github.com/hawx/serve"
 
+	"bytes"
 	"encoding/json"
 	"flag"
-	"bytes"
 	"io/ioutil"
 	"net/http"
+	"time"
 )
 
 var (
-	port   = flag.String("port", "8080", "")
-	socket = flag.String("socket", "", "")
-	river  = flag.String("river", "", "")
+	port     = flag.String("port", "8080", "")
+	socket   = flag.String("socket", "", "")
+	river    = flag.String("river", "", "")
+	timezone = flag.String("timezone", "UTC", "")
 )
 
 const (
@@ -28,6 +30,12 @@ func main() {
 	flag.Parse()
 	if *river == "" {
 		println("err: --river must be given")
+		return
+	}
+
+	loc, err := time.LoadLocation(*timezone)
+	if err != nil || loc == nil {
+		println("err: --timezone invalid")
 		return
 	}
 
@@ -48,7 +56,7 @@ func main() {
 		var river models.River
 		json.Unmarshal(data, &river)
 
-		views.List.Execute(w, river)
+		views.List.Execute(w, river.SetLocation(*loc))
 	})
 
 	serve.Serve(*port, *socket, http.DefaultServeMux)

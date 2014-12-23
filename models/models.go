@@ -1,8 +1,8 @@
 package models
 
 import (
-	"time"
 	"html/template"
+	"time"
 )
 
 type RssTime struct {
@@ -36,7 +36,9 @@ func (t *RssTime) UnmarshalJSON(data []byte) error {
 }
 
 func (t *RssTime) HtmlFormat() template.HTML {
-	return template.HTML("<time pubdate=\"" + t.Format(time.RFC3339) + "\">" + t.UTC().Format("02 Jan; 15:05 PM") + "</time>")
+	return template.HTML("<time pubdate=\"" + t.Format(time.RFC3339) + "\">" +
+		t.Format("02 Jan; 15:04 PM") +
+		"</time>")
 }
 
 type River struct {
@@ -44,8 +46,19 @@ type River struct {
 	Metadata     Metadata
 }
 
+func (r River) SetLocation(loc time.Location) River {
+	return River{r.UpdatedFeeds.SetLocation(loc), r.Metadata}
+}
+
 type UpdatedFeeds struct {
 	UpdatedFeed []UpdatedFeed
+}
+
+func (r UpdatedFeeds) SetLocation(loc time.Location) UpdatedFeeds {
+	for i, _ := range r.UpdatedFeed {
+		r.UpdatedFeed[i] = r.UpdatedFeed[i].SetLocation(loc)
+	}
+	return r
 }
 
 type UpdatedFeed struct {
@@ -57,6 +70,14 @@ type UpdatedFeed struct {
 	Item            []Item
 }
 
+func (r UpdatedFeed) SetLocation(loc time.Location) UpdatedFeed {
+	r.WhenLastUpdate = RssTime{r.WhenLastUpdate.In(&loc)}
+	for i, _ := range r.Item {
+		r.Item[i] = r.Item[i].SetLocation(loc)
+	}
+	return r
+}
+
 type Item struct {
 	Body      string
 	Permalink string
@@ -64,6 +85,11 @@ type Item struct {
 	Title     string
 	Link      string
 	Id        string
+}
+
+func (r Item) SetLocation(loc time.Location) Item {
+	r.PubDate = RssTime{r.PubDate.In(&loc)}
+	return r
 }
 
 type Metadata struct {
