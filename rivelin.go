@@ -34,58 +34,79 @@ var tmpl = template.Must(template.New("tmpl").Parse(`
       }
 
       body {
-          font: 100%/1.2rem Helvetica, sans-serif;
-          color: #333;
+          font: 14px/1.3 Verdana, Geneva, sans-serif;
+          color: #000;
           background: #fff;
+          word-break: break-all;
+          hyphens: auto;
       }
 
       a, a:visited {
           text-decoration: none;
-          color: #1E68A6;
+          color: #365da9;
       }
       a:hover, a:focus, a:active {
           text-decoration: underline;
+          color: #2a6497;
       }
 
-      body > header h1, body > .updated, body > ul {
-          max-width: 36rem;
+      .container {
+          max-width: 40em;
           margin: 0 auto;
+          padding: 0 1em;
+      }
+      .container:before, .container:after {
+          clear: both;
+          content: " ";
+          display: table;
       }
 
-      body > header {
-          background: #1E68A6;
-          padding: .75rem 0;
-          margin: 0 0 3rem;
+      .page-title {
+          background: #eee;
+          border-bottom: 1px solid #ddd;
+          padding: 0;
+          margin: 0;
       }
-      body > header h1 {
-          font-size: 1rem;
-          color: #fff;
+      .page-title h1 {
+          font-size: 1.5em;
+          padding: 1.3rem;
+          margin: 0;
+          height: 1.3rem;
+          line-height: 1.3rem;
+          display: inline-block;
+          padding-left: 0;
+          font-weight: bold;
       }
 
       ul { list-style: none; padding: 0; }
 
+      .blocks {
+          width: auto;
+          margin: 2.6rem 0;
+      }
+
       .block {
           clear: both;
           padding: .5rem 0 0;
-          border-top: 1px solid #ccc;
-          margin: 1.5rem 0 0;
+          border-top: 1px solid #ddd;
+          margin: 1.1rem 0 0;
       }
-      .block > header h1, .block > header time {
+      .block-title h1, .block-title time {
           float: left;
           padding: 0 .5rem 0 0;
-          margin: -1.3rem 0 0;
+          margin: -1.1rem 0 0;
           font-size: .75rem;
           font-weight: normal;
           background: #fff;
       }
-      .block > header .icon {
+      .block-title .icon {
           position: relative;
           float: left;
           margin: 0 .5rem 0 -1.5rem;
           border: 0 none;
           vertical-align: middle;
       }
-      .block > header time {
+      .block-title time {
           float: right;
           padding: 0 0 0 .5rem;
           color: #777;
@@ -97,34 +118,41 @@ var tmpl = template.Must(template.New("tmpl").Parse(`
           padding: 1rem 0;
           margin: 0;
       }
-      .item > header {
+      .item header {
           margin: 0 0 .3rem;
       }
-      .item > h2 {
+      .item h2 {
           font-size: 1rem;
           margin: 0;
       }
-      .item > p {
+      .item p {
           font-size: 0.875rem;
           margin: .2rem 0;
       }
-      .item > time {
+      .item time {
           clear: both;
           margin: 0 1.5rem 0 0;
           font-size: .6875rem;
           color: #666;
       }
+
+      @media screen and (max-width: 40rem) {
+          .block .icon { display: none; }
+      }
     </style>
   </head>
   <body>
-    <header>
-      <h1>Rivelin</h1>
+    <header class="page-title">
+      <div class="container">
+        <h1>rivelin</h1>
+      </div>
     </header>
 
-    <ul>
-      {{range .UpdatedFeeds.UpdatedFeed}}
+    <div class="container">
+      <ul class="blocks">
+        {{range .UpdatedFeeds.UpdatedFeed}}
         <li class="block">
-          <header>
+          <header class="block-title">
             <h1>
               <img class="icon" src="http://www.google.com/s2/favicons?domain={{.WebsiteUrl}}" alt="">
               <a href="{{.WebsiteUrl}}">{{.FeedTitle}}</a>
@@ -132,18 +160,19 @@ var tmpl = template.Must(template.New("tmpl").Parse(`
             </h1>
             {{.WhenLastUpdate.HtmlFormat}}
           </header>
-          <ul>
+          <ul class="items">
             {{range .Item}}
-              <li class="item" id="{{.Id}}">
-                <h2><a rel="external" href="{{.Link}}">{{.Title}}</a></h2>
-                <p>{{.Body}}</p>
-                {{.PubDate.HtmlFormat}}
-              </li>
+            <li class="item" id="{{.Id}}">
+              <h2><a rel="external" href="{{.Link}}">{{.Title}}</a></h2>
+              <p>{{.Body}}</p>
+              {{.PubDate.HtmlFormat}}
+            </li>
             {{end}}
           </ul>
         </li>
-      {{end}}
-    </ul>
+        {{end}}
+      </ul>
+    </div>
   </body>
 </html>
 `))
