@@ -120,7 +120,7 @@ const list = `<!DOCTYPE html>
       }
 
       @media screen and (max-width: 40rem) {
-          .block .icon { display: none; }
+          .block-title .icon, .block-title .feed { display: none; }
       }
     </style>
   </head>
@@ -139,7 +139,7 @@ const list = `<!DOCTYPE html>
             <h1>
               <img class="icon" src="http://www.google.com/s2/favicons?domain={{.WebsiteUrl}}" alt="">
               <a href="{{.WebsiteUrl}}">{{.FeedTitle}}</a>
-              (<a href="{{.FeedUrl}}">Feed</a>)
+              <span class="feed">(<a href="{{.FeedUrl}}">Feed</a>)</span>
             </h1>
             {{.WhenLastUpdate.HtmlFormat}}
           </header>
