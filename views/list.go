@@ -20,8 +20,6 @@ const list = `<!DOCTYPE html>
           font: 14px/1.3 Verdana, Geneva, sans-serif;
           color: #000;
           background: #fff;
-          word-break: break-all;
-          hyphens: auto;
       }
 
       a, a:visited {
