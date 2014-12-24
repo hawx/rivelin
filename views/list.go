@@ -147,7 +147,7 @@ const list = `<!DOCTYPE html>
             {{range .Item}}
             <li class="item" id="{{.Id}}">
               <h2><a rel="external" href="{{.Link}}">{{.Title}}</a></h2>
-              <p>{{.Body}}</p>
+              <p>{{.FilteredBody}}</p>
               {{.PubDate.HtmlFormat}}
             </li>
             {{end}}

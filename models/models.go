@@ -2,6 +2,7 @@ package models
 
 import (
 	"html/template"
+	"strings"
 	"time"
 )
 
@@ -85,6 +86,17 @@ type Item struct {
 	Title     string
 	Link      string
 	Id        string
+}
+
+func (r Item) FilteredBody() string {
+	r.Body = strings.TrimSpace(r.Body)
+
+	if strings.HasPrefix(r.Body, "&amp;lt;") ||
+		strings.HasPrefix(r.Body, "var gaJsHost") {
+		return ""
+	}
+
+	return r.Body
 }
 
 func (r Item) SetLocation(loc time.Location) Item {
