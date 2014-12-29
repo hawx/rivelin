@@ -110,7 +110,7 @@ const list = `<!DOCTYPE html>
           font-size: 0.875rem;
           margin: .2rem 0;
       }
-      .item time {
+      .item .timea {
           clear: both;
           margin: 0 1.5rem 0 0;
           font-size: .6875rem;
@@ -146,7 +146,7 @@ const list = `<!DOCTYPE html>
             <li class="item" id="{{.Id}}">
               <h2><a rel="external" href="{{.Link}}">{{.Title}}</a></h2>
               <p>{{.FilteredBody}}</p>
-              {{.PubDate.HtmlFormat}}
+              <a class="timea" rel="external" href="{{.Link}}">{{.PubDate.HtmlFormat}}</a>
             </li>
             {{end}}
           </ul>
