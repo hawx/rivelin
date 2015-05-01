@@ -3,7 +3,7 @@
 A web reader for [river.js][] (that doesn't rely on js).
 
 ``` bash
-$ go get github.com/hawx/rivelin
+$ go get hawx.me/code/rivelin
 $ rivelin --river http://example.com/river.js
 ...
 ```

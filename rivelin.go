@@ -1,8 +1,8 @@
 package main
 
 import (
-	"github.com/hawx/rivelin/models"
-	"github.com/hawx/rivelin/views"
+	"hawx.me/code/rivelin/models"
+	"hawx.me/code/rivelin/views"
 
 	"github.com/hawx/serve"
 
