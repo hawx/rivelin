@@ -4,7 +4,7 @@ import (
 	"hawx.me/code/rivelin/models"
 	"hawx.me/code/rivelin/views"
 
-	"github.com/hawx/serve"
+	"hawx.me/code/serve"
 
 	"bytes"
 	"encoding/json"
