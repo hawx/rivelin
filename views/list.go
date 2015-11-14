@@ -117,18 +117,23 @@ const list = `<!DOCTYPE html>
           color: #666;
       }
 
+      footer {
+          text-align: center;
+          padding-bottom: 3rem;
+          font-size: .6875rem;
+          color: #bbb;
+      }
+      footer a, footer a:hover, footer a:visited, footer a:focus, footer a:active {
+          color: #bbb;
+          text-decoration: underline;
+      }
+
       @media screen and (max-width: 40rem) {
           .block-title .icon, .block-title .feed { display: none; }
       }
     </style>
   </head>
   <body>
-    <header class="page-title">
-      <div class="container">
-        <h1>rivelin</h1>
-      </div>
-    </header>
-
     <div class="container">
       <ul class="blocks">
         {{range .UpdatedFeeds.UpdatedFeed}}
@@ -153,6 +158,10 @@ const list = `<!DOCTYPE html>
         </li>
         {{end}}
       </ul>
+
+      <footer>
+        <a href="http://hawx.me/code/rivelin">rivelin</a> + <a href="http://hawx.me/code/riviera">riviera</a>
+      </footer>
     </div>
   </body>
 </html>`
