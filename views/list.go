@@ -140,7 +140,7 @@ const list = `<!DOCTYPE html>
         <li class="block">
           <header class="block-title">
             <h1>
-              <img class="icon" src="http://www.google.com/s2/favicons?domain={{.WebsiteUrl}}" alt="">
+              <img class="icon" src="//www.google.com/s2/favicons?domain={{.WebsiteUrl}}" alt="">
               <a href="{{.WebsiteUrl}}">{{.FeedTitle}}</a>
               <span class="feed">(<a href="{{.FeedUrl}}">Feed</a>)</span>
             </h1>
