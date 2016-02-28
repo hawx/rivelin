@@ -17,7 +17,7 @@ const list = `<!DOCTYPE html>
       }
 
       body {
-          font: 14px/1.3 Verdana, Geneva, sans-serif;
+          font: 1em/1.3 Verdana, Geneva, sans-serif;
           color: #000;
           background: #fff;
       }
