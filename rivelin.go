@@ -1,6 +1,8 @@
 package main
 
 import (
+	"log"
+
 	"hawx.me/code/rivelin/models"
 	"hawx.me/code/rivelin/views"
 
@@ -50,19 +52,26 @@ func main() {
 	http.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
 		resp, err := http.Get(*river)
 		if err != nil {
+			log.Println("/", err)
 			w.WriteHeader(500) // could not connect
+			return
 		}
 
 		data, err := ioutil.ReadAll(resp.Body)
 		if err != nil {
+			log.Println("/", err)
 			w.WriteHeader(500) // could not parse, should have nice msg!?!
+			return
 		}
 
 		// hate this. maybe, func TrimPrefix(io.Reader, string) io.Reader ???
 		data = bytes.TrimSuffix(bytes.TrimPrefix(data, []byte(PREFIX)), []byte(SUFFIX))
 
 		var river models.River
-		json.Unmarshal(data, &river)
+		err = json.Unmarshal(data, &river)
+		if err != nil {
+			log.Println("/", err)
+		}
 
 		views.List.Execute(w, river.SetLocation(*loc))
 	})
@@ -72,11 +81,18 @@ func main() {
 			logURL, _ := riverURL.Parse("log")
 			resp, err := http.Get(logURL.String())
 			if err != nil {
+				log.Println("/log", err)
 				w.WriteHeader(500)
+				return
 			}
 
 			var logList []models.LogLine
 			err = json.NewDecoder(resp.Body).Decode(&logList)
+			if err != nil {
+				log.Println("/log", err)
+				w.WriteHeader(500)
+				return
+			}
 
 			views.Log.Execute(w, models.MakeLogBlocks(logList))
 		})
