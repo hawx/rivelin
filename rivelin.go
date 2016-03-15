@@ -11,6 +11,7 @@ import (
 	"flag"
 	"io/ioutil"
 	"net/http"
+	"net/url"
 	"time"
 )
 
@@ -19,6 +20,7 @@ var (
 	socket   = flag.String("socket", "", "")
 	river    = flag.String("river", "", "")
 	timezone = flag.String("timezone", "UTC", "")
+	withLog  = flag.Bool("with-log", false, "")
 )
 
 const (
@@ -36,6 +38,12 @@ func main() {
 	loc, err := time.LoadLocation(*timezone)
 	if err != nil || loc == nil {
 		println("err: --timezone invalid")
+		return
+	}
+
+	riverURL, err := url.Parse(*river)
+	if err != nil {
+		println("err: --river invalid")
 		return
 	}
 
@@ -58,6 +66,21 @@ func main() {
 
 		views.List.Execute(w, river.SetLocation(*loc))
 	})
+
+	if *withLog {
+		http.HandleFunc("/log", func(w http.ResponseWriter, r *http.Request) {
+			logURL, _ := riverURL.Parse("log")
+			resp, err := http.Get(logURL.String())
+			if err != nil {
+				w.WriteHeader(500)
+			}
+
+			var logList []models.LogLine
+			err = json.NewDecoder(resp.Body).Decode(&logList)
+
+			views.Log.Execute(w, models.MakeLogBlocks(logList))
+		})
+	}
 
 	serve.Serve(*port, *socket, http.DefaultServeMux)
 }
