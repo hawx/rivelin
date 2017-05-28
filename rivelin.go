@@ -1,11 +1,10 @@
 package main
 
 import (
-	"bytes"
+	"bufio"
 	"encoding/json"
 	"flag"
 	"fmt"
-	"io/ioutil"
 	"log"
 	"net/http"
 	"net/url"
@@ -41,11 +40,6 @@ func printHelp() {
 `)
 }
 
-const (
-	PREFIX = "onGetRiverStream("
-	SUFFIX = ")"
-)
-
 func main() {
 	var (
 		port     = flag.String("port", "8080", "")
@@ -78,23 +72,16 @@ func main() {
 		resp, err := http.Get(*river)
 		if err != nil {
 			log.Println("/", err)
-			w.WriteHeader(502) // could not connect
+			w.WriteHeader(502)
 			return
 		}
+		defer resp.Body.Close()
 
-		data, err := ioutil.ReadAll(resp.Body)
-		if err != nil {
-			log.Println("/", err)
-			w.WriteHeader(500)
-			return
-		}
-
-		// hate this. maybe, func TrimPrefix(io.Reader, string) io.Reader ???
-		data = bytes.TrimSuffix(bytes.TrimPrefix(data, []byte(PREFIX)), []byte(SUFFIX))
+		bufferedBody := bufio.NewReader(resp.Body)
+		bufferedBody.ReadBytes('(')
 
 		var river models.River
-		err = json.Unmarshal(data, &river)
-		if err != nil {
+		if err = json.NewDecoder(bufferedBody).Decode(&river); err != nil {
 			log.Println("/", err)
 		}
 
@@ -104,16 +91,17 @@ func main() {
 	if *withLog {
 		http.HandleFunc("/log", func(w http.ResponseWriter, r *http.Request) {
 			logURL, _ := riverURL.Parse("log")
+
 			resp, err := http.Get(logURL.String())
 			if err != nil {
 				log.Println("/log", err)
-				w.WriteHeader(500)
+				w.WriteHeader(502)
 				return
 			}
+			defer resp.Body.Close()
 
 			var logList []models.LogLine
-			err = json.NewDecoder(resp.Body).Decode(&logList)
-			if err != nil {
+			if err = json.NewDecoder(resp.Body).Decode(&logList); err != nil {
 				log.Println("/log", err)
 				w.WriteHeader(500)
 				return
