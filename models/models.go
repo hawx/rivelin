@@ -44,11 +44,11 @@ func (t *RssTime) HtmlFormat() template.HTML {
 
 type River struct {
 	UpdatedFeeds UpdatedFeeds
-	Metadata     Metadata
+	// Metadata     Metadata
 }
 
 func (r River) SetLocation(loc time.Location) River {
-	return River{r.UpdatedFeeds.SetLocation(loc), r.Metadata}
+	return River{UpdatedFeeds: r.UpdatedFeeds.SetLocation(loc)}
 }
 
 type UpdatedFeeds struct {
