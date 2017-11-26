@@ -85,7 +85,9 @@ func main() {
 			log.Println("/", err)
 		}
 
-		views.List.Execute(w, river.SetLocation(*loc))
+		if err = views.List.Execute(w, river.SetLocation(*loc)); err != nil {
+			log.Println("/", err)
+		}
 	})
 
 	if *withLog {

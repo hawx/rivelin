@@ -109,6 +109,9 @@ const pre = `<!DOCTYPE html>
           font-size: 1rem;
           margin: 0;
       }
+      .item summary h2 {
+          display: inline-block;
+      }
       .item p {
           font-size: 0.875rem;
           margin: .2rem 0;
@@ -118,6 +121,9 @@ const pre = `<!DOCTYPE html>
           margin: 0 1.5rem 0 0;
           font-size: .6875rem;
           color: #666;
+      }
+      .item img {
+          max-width: 100%;
       }
       .item .code {
           float: right;

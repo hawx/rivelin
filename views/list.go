@@ -14,9 +14,20 @@ const list = pre + `<ul class="blocks">
     <ul class="items">
       {{range .Item}}
       <li class="item" id="{{.Id}}">
+        {{ if .Thumbnail }}
+        <details>
+          <summary>
+            <h2><a rel="external" href="{{.Link}}">{{.Title}}</a></h2>
+          </summary>
+          <img src="{{.Thumbnail.URL}}" />
+        </details>
+        <p>{{.FilteredBody}}</p>
+        <a class="timea" rel="external" href="{{.Link}}">{{.PubDate.HtmlFormat}}</a>
+        {{ else }}
         <h2><a rel="external" href="{{.Link}}">{{.Title}}</a></h2>
         <p>{{.FilteredBody}}</p>
         <a class="timea" rel="external" href="{{.Link}}">{{.PubDate.HtmlFormat}}</a>
+        {{ end }}
       </li>
       {{end}}
     </ul>

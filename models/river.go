@@ -48,6 +48,9 @@ type Item struct {
 	Title     string
 	Link      string
 	Id        string
+	Thumbnail *struct {
+		URL string
+	}
 }
 
 func (r Item) FilteredBody() string {
