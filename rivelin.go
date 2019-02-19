@@ -6,6 +6,7 @@ import (
 	"flag"
 	"fmt"
 	"log"
+	"net"
 	"net/http"
 	"net/url"
 	"time"
@@ -68,8 +69,27 @@ func main() {
 		return
 	}
 
+	// use default values from DefaultTransport
+	tr := &http.Transport{
+		Proxy: http.ProxyFromEnvironment,
+		DialContext: (&net.Dialer{
+			Timeout:   30 * time.Second,
+			KeepAlive: 30 * time.Second,
+			DualStack: true,
+		}).DialContext,
+		MaxIdleConns:          100,
+		IdleConnTimeout:       90 * time.Second,
+		TLSHandshakeTimeout:   10 * time.Second,
+		ExpectContinueTimeout: 1 * time.Second,
+	}
+
+	httpClient := &http.Client{
+		Timeout:   10 * time.Second,
+		Transport: tr,
+	}
+
 	http.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
-		resp, err := http.Get(*river)
+		resp, err := httpClient.Get(*river)
 		if err != nil {
 			log.Println("/", err)
 			w.WriteHeader(502)
@@ -94,7 +114,7 @@ func main() {
 		http.HandleFunc("/log", func(w http.ResponseWriter, r *http.Request) {
 			logURL, _ := riverURL.Parse("log")
 
-			resp, err := http.Get(logURL.String())
+			resp, err := httpClient.Get(logURL.String())
 			if err != nil {
 				log.Println("/log", err)
 				w.WriteHeader(502)
@@ -113,5 +133,12 @@ func main() {
 		})
 	}
 
-	serve.Serve(*port, *socket, http.DefaultServeMux)
+	srv := &http.Server{
+		ReadTimeout:  5 * time.Second,
+		WriteTimeout: 10 * time.Second,
+		IdleTimeout:  120 * time.Second,
+		Handler:      http.DefaultServeMux,
+	}
+
+	serve.Server(*port, *socket, srv)
 }
