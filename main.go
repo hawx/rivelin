@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"flag"
 	"fmt"
+	"html/template"
 	"log"
 	"net"
 	"net/http"
@@ -12,7 +13,6 @@ import (
 	"time"
 
 	"hawx.me/code/rivelin/models"
-	"hawx.me/code/rivelin/views"
 	"hawx.me/code/serve"
 )
 
@@ -21,7 +21,6 @@ func printHelp() {
 
   Rivelin is a web reader for riverjs (http://riverjs.org) files.
 
- DISPLAY
    --river URL
       Full URL to the riverjs file to read from.
 
@@ -32,13 +31,14 @@ func printHelp() {
       Also serve a log of feed reading activity at '/log'. Will probably only
       work when reading from a riviera generated feed.
 
- SERVE
+   --web PATH
+      Path to the 'web' directory.
+
    --port PORT='8080'
       Serve on given port.
 
    --socket SOCK
-      Serve at given socket, instead.
-`)
+      Serve at given socket, instead.`)
 }
 
 func main() {
@@ -48,24 +48,31 @@ func main() {
 		river    = flag.String("river", "", "")
 		timezone = flag.String("timezone", "UTC", "")
 		withLog  = flag.Bool("with-log", false, "")
+		webPath  = flag.String("web", "web", "")
 	)
-
 	flag.Usage = printHelp
 	flag.Parse()
+
 	if *river == "" {
-		println("err: --river must be given")
+		fmt.Println("err: --river must be given")
 		return
 	}
 
 	loc, err := time.LoadLocation(*timezone)
 	if err != nil || loc == nil {
-		println("err: --timezone invalid")
+		fmt.Println("err: --timezone invalid")
 		return
 	}
 
 	riverURL, err := url.Parse(*river)
 	if err != nil {
-		println("err: --river invalid")
+		fmt.Println("err: --river invalid")
+		return
+	}
+
+	templates, err := template.ParseGlob(*webPath + "/template/*.gotmpl")
+	if err != nil {
+		fmt.Println(err)
 		return
 	}
 
@@ -103,9 +110,10 @@ func main() {
 		var river models.River
 		if err = json.NewDecoder(bufferedBody).Decode(&river); err != nil {
 			log.Println("/", err)
+			return
 		}
 
-		if err = views.List.Execute(w, river.SetLocation(*loc)); err != nil {
+		if err = templates.ExecuteTemplate(w, "list.gotmpl", river.SetLocation(*loc)); err != nil {
 			log.Println("/", err)
 		}
 	})
@@ -129,9 +137,13 @@ func main() {
 				return
 			}
 
-			views.Log.Execute(w, models.MakeLogBlocks(logList))
+			if err = templates.ExecuteTemplate(w, "log.gotmpl", models.MakeLogBlocks(logList)); err != nil {
+				log.Println("/log", err)
+			}
 		})
 	}
+
+	http.Handle("/public/", http.StripPrefix("/public", http.FileServer(http.Dir(*webPath+"/static"))))
 
 	srv := &http.Server{
 		ReadTimeout:  5 * time.Second,
